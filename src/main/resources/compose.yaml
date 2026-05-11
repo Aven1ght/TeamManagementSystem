@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+
+    container_name: my_postgres
+
+    environment:
+      POSTGRES_DB: TeamManagementSystem
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      TZ: Europe/Kyiv
+      PGTZ: Europe/Kyiv
+
+    ports:
+      - "5433:5432"
