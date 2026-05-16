@@ -6,7 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ua.rud.teammanagementsystem.Entity.User;
+import ua.rud.teammanagementsystem.entity.User;
 import ua.rud.teammanagementsystem.Enums.Role;
 import ua.rud.teammanagementsystem.Repositories.UserRepository;
 
@@ -22,7 +22,7 @@ public class AuthenticationService {
 
     public AuthenticationResponse register(AuthenticationRequest request){
         User user = User.builder()
-                .name(request.getName())
+                .username(request.getName())
                 .password(encoder.encode(request.getPassword()))
                 .email(request.getEmail())
                 .role(Role.USER)
@@ -40,7 +40,7 @@ public class AuthenticationService {
         );
 
         var user = userRepository
-                .findByName(request.getName())
+                .findByUsername(request.getName())
                 .orElseThrow();
 
         String jwt = jwtService.generateToken(user);

@@ -20,7 +20,7 @@ private final UserRepository userRepository;
 
     @Bean
 UserDetailsService userDetailsService(){
-        return username -> userRepository.findByName(username).orElseThrow(() -> new UsernameNotFoundException("Wrong username"));
+        return username -> userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Wrong username"));
 }
     @Bean
     PasswordEncoder encoder(){

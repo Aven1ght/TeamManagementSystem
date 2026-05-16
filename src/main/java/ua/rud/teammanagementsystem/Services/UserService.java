@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ua.rud.teammanagementsystem.Entity.User;
+import ua.rud.teammanagementsystem.entity.User;
 import ua.rud.teammanagementsystem.Exceptions.NotFoundException;
 import ua.rud.teammanagementsystem.Mappers.UserMapper;
 import ua.rud.teammanagementsystem.Repositories.UserRepository;
