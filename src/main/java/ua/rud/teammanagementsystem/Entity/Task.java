@@ -36,9 +36,11 @@ public class Task {
     @Column(name = "task_deadline")
     private LocalDate deadline;
 
-    @Column(name = "project_id")
-    private Long project_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    private Project project;
 
-    @Column(name = "assigned_user_id")
-    private Long user_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }

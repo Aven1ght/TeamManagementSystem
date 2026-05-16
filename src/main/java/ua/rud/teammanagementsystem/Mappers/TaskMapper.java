@@ -14,8 +14,8 @@ public class TaskMapper {
                 t.getStatus(),
                 t.getPriority(),
                 t.getDeadline(),
-                t.getProject_id(),
-                t.getUser_id()
+                t.getProject().getId(),
+                t.getUser().getId()
         );
     }
 }

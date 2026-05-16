@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import ua.rud.teammanagementsystem.Enums.TaskStatus;
 import ua.rud.teammanagementsystem.Exceptions.NotFoundException;
 import ua.rud.teammanagementsystem.Mappers.TaskMapper;
+import ua.rud.teammanagementsystem.Repositories.ProjectRepository;
 import ua.rud.teammanagementsystem.Repositories.TaskRepository;
+import ua.rud.teammanagementsystem.Repositories.UserRepository;
 import ua.rud.teammanagementsystem.Requests.TaskRequest;
 import ua.rud.teammanagementsystem.Responses.TaskResponse;
 import ua.rud.teammanagementsystem.entity.Task;
@@ -21,6 +23,8 @@ import java.time.LocalDate;
 public class TaskService {
     private final TaskMapper mapper;
     private final TaskRepository repository;
+    private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
 
     public Page<TaskResponse> getAllTasks(Pageable pageable) {
        return repository.findAll(pageable).map(mapper::mapTo);
@@ -39,8 +43,8 @@ public class TaskService {
             TaskStatus.CREATED,
             request.priority(),
             LocalDate.now().plusDays(20),
-            request.project_id(),
-            request.user_id()
+            projectRepository.findById(request.project_id()).orElseThrow(()->new NotFoundException("Wrong project id")),
+            userRepository.findById(request.user_id()).orElseThrow(()->new NotFoundException("Wrong user id"))
     );
     repository.save(task);
     return mapper.mapTo(task);
@@ -60,8 +64,8 @@ public class TaskService {
                 task.getStatus(),
                 request.priority(),
                 task.getDeadline(),
-                request.project_id(),
-                request.user_id()
+                projectRepository.findById(request.project_id()).orElseThrow(()->new NotFoundException("Wrong project id")),
+                userRepository.findById(request.user_id()).orElseThrow(()->new NotFoundException("Wrong user id"))
         );
         repository.save(changedTask);
         return mapper.mapTo(changedTask);
