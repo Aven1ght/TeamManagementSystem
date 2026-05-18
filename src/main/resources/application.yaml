@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/TeamManagementSystem
     username: postgres
-    password: root
+    password: postgres # <-- ВИПРАВЛЕНО: пароль тепер збігається з compose.yaml
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -25,8 +25,9 @@ spring:
 
   docker:
     compose:
-      lifecycle-management: start_only
-      enabled: false
+      lifecycle-management: start_and_stop
+      enabled: true
+
 logging:
   level:
     org.hibernate.orm: DEBUG

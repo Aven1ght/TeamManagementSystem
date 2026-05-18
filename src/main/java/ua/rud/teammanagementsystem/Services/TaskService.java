@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import ua.rud.teammanagementsystem.Enums.TaskStatus;
 import ua.rud.teammanagementsystem.Exceptions.NotFoundException;
@@ -17,6 +18,7 @@ import ua.rud.teammanagementsystem.Requests.TaskRequest;
 import ua.rud.teammanagementsystem.Responses.TaskResponse;
 import ua.rud.teammanagementsystem.entity.Task;
 
+import java.time.Duration;
 import java.time.LocalDate;
 
 @Service
@@ -28,15 +30,25 @@ public class TaskService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final Logger log = LoggerFactory.getLogger(TaskService.class);
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final CacheService cacheService;
+
     public Page<TaskResponse> getAllTasks(Pageable pageable) {
         log.info("All tasks got successfully");
        return repository.findAll(pageable).map(mapper::mapTo);
     }
 
     public TaskResponse getById(Long id){
-        Task task = repository.findById(id).orElseThrow(()-> new NotFoundException("Wrong id"));
+       TaskResponse cachedResponse = cacheService.get(id.toString(), TaskResponse.class);
+
+       if(cachedResponse != null){
+           log.info("Task with id {} got from cache successfully", id);
+           return cachedResponse;
+       }
+        TaskResponse response = mapper.mapTo(repository.findById(id).orElseThrow(()-> new NotFoundException("Wrong id")));
+        cacheService.set(id.toString(), response, 10);
         log.info("Task with id {} got successfully", id);
-        return mapper.mapTo(task);
+        return response;
     }
 
     public TaskResponse createTask(TaskRequest request) {
@@ -57,6 +69,7 @@ public class TaskService {
 
     public void deleteTask(Long id) {
         Task task = repository.findById(id).orElseThrow(()-> new NotFoundException("Wrong id"));
+        cacheService.delete(id.toString());
         log.info("Task with id {} deleted successfully", id);
         repository.delete(task);
     }
@@ -74,6 +87,7 @@ public class TaskService {
                 userRepository.findById(request.user_id()).orElseThrow(()->new NotFoundException("Wrong user id"))
         );
         repository.save(changedTask);
+        cacheService.delete(id.toString());
         log.info("Task with id {} changed successfully", id);
         return mapper.mapTo(changedTask);
     }

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import ua.rud.teammanagementsystem.Exceptions.NotFoundException;
 import ua.rud.teammanagementsystem.Mappers.CommentMapper;
@@ -16,6 +17,7 @@ import ua.rud.teammanagementsystem.Requests.CommentRequest;
 import ua.rud.teammanagementsystem.Responses.CommentResponse;
 import ua.rud.teammanagementsystem.entity.Comment;
 
+import java.time.Duration;
 import java.time.LocalDate;
 
 @Service
@@ -27,15 +29,24 @@ private final CommentRepository repository;
 private final TaskRepository taskRepository;
 private final UserRepository userRepository;
 private final Logger log = LoggerFactory.getLogger(CommentService.class);
+private final RedisTemplate<String, Object> redisTemplate;
+private final CacheService cacheService;
     public Page<CommentResponse> getAllComments(Pageable pageable) {
         log.info("All comments got successfully");
         return repository.findAll(pageable).map(mapper::mapTo);
     }
 
     public CommentResponse getById(Long id) {
-        Comment comment = repository.findById(id).orElseThrow(()->new NotFoundException("Wrong id"));
+        CommentResponse cached = cacheService.get(id.toString(), CommentResponse.class);
+        if(cached != null){
+            log.info("Comment with id {} got from cache successfully", id);
+            return cached;
+        }
+
+        CommentResponse response = mapper.mapTo(repository.findById(id).orElseThrow(()->new NotFoundException("Wrong id")));
+        cacheService.set(id.toString(), response, 10);
         log.info("Comment with id {} got successfully", id);
-        return mapper.mapTo(comment);
+        return response;
     }
 
     public CommentResponse createComment(CommentRequest request) {

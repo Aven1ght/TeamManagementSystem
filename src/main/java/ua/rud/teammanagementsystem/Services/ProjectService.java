@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import ua.rud.teammanagementsystem.Exceptions.NotFoundException;
 import ua.rud.teammanagementsystem.Mappers.ProjectMapper;
@@ -14,6 +15,8 @@ import ua.rud.teammanagementsystem.Requests.ProjectRequest;
 import ua.rud.teammanagementsystem.Responses.ProjectResponse;
 import ua.rud.teammanagementsystem.entity.Project;
 
+import java.time.Duration;
+
 
 @Service
 @Transactional
@@ -21,17 +24,25 @@ import ua.rud.teammanagementsystem.entity.Project;
 public class ProjectService {
 private final ProjectMapper mapper;
 private final ProjectRepository repository;
-Logger log = LoggerFactory.getLogger(ProjectService.class);
-
+private final Logger log = LoggerFactory.getLogger(ProjectService.class);
+private final RedisTemplate<String, Object> redisTemplate;
+private final CacheService cacheService;
     public Page<ProjectResponse> getAllProjects(Pageable pageable) {
         log.info("All project got successfully");
         return repository.findAll(pageable).map(mapper::mapTo);
     }
 
     public ProjectResponse getById(Long id) {
-        Project project = repository.findById(id).orElseThrow(()-> new NotFoundException("Wrong id"));
+        ProjectResponse cached = cacheService.get(id.toString(), ProjectResponse.class);
+        if(cached != null){
+            log.info("Project with id {} got from cache successfully", id);
+            return cached;
+        }
+
+        ProjectResponse response = mapper.mapTo(repository.findById(id).orElseThrow(()-> new NotFoundException("Wrong id")));
+        cacheService.set(id.toString(), response, 10);
         log.info("Project with id {} got successfully", id);
-        return mapper.mapTo(project);
+        return response;
     }
 
     public ProjectResponse createProject(ProjectRequest request) {

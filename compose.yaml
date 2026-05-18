@@ -1,13 +1,28 @@
+name: teammanagementsystem
+
 services:
   postgres:
-    image: 'postgres:latest'
+    image: postgres:16
+    container_name: teammanagementsystem-postgres
     environment:
-      - 'POSTGRES_DB=TeamManagementSystem'
-      - 'POSTGRES_PASSWORD=postgres'
-      - 'POSTGRES_USER=root'
+      POSTGRES_DB: TeamManagementSystem
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - '5432'
+      - "5432:5432" # <-- ВИПРАВЛЕНО: тепер жорстко зафіксовано на стандартному порту
+
+    networks:
+      - default
+
   redis:
-    image: 'redis:latest'
+    image: redis:latest
+    container_name: teammanagementsystem-redis
     ports:
-      - '6379'
+      - "6379:6379" # <-- Порт зафіксовано
+
+    networks:
+      - default
+
+networks:
+  default:
+    name: teammanagementsystem_default
