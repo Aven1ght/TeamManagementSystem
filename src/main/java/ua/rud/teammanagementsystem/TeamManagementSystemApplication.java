@@ -12,6 +12,10 @@ public class TeamManagementSystemApplication {
     public static void main(String[] args) {
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/Kyiv"));
         SpringApplication.run(TeamManagementSystemApplication.class, args);
+
+        //логування
+        //кешування
+        //підключити докер
     }
 
 }

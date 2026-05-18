@@ -1,0 +1,50 @@
+package ua.rud.teammanagementsystem.Services;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import ua.rud.teammanagementsystem.Exceptions.NotFoundException;
+import ua.rud.teammanagementsystem.Mappers.CommentMapper;
+import ua.rud.teammanagementsystem.Repositories.CommentRepository;
+import ua.rud.teammanagementsystem.Repositories.TaskRepository;
+import ua.rud.teammanagementsystem.Repositories.UserRepository;
+import ua.rud.teammanagementsystem.Requests.CommentRequest;
+import ua.rud.teammanagementsystem.Responses.CommentResponse;
+import ua.rud.teammanagementsystem.entity.Comment;
+
+import java.time.LocalDate;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class CommentService {
+private final CommentMapper mapper;
+private final CommentRepository repository;
+private final TaskRepository taskRepository;
+private final UserRepository userRepository;
+
+    public Page<CommentResponse> getAllComments(Pageable pageable) {
+        return repository.findAll(pageable).map(mapper::mapTo);
+    }
+
+    public CommentResponse getById(Long id) {
+        Comment comment = repository.findById(id).orElseThrow(()->new NotFoundException("Wrong id"));
+        return mapper.mapTo(comment);
+    }
+
+    public CommentResponse createComment(CommentRequest request) {
+        Comment comment = new Comment(
+                null,
+                request.text(),
+                taskRepository.findById(request.taskId()).orElseThrow(()->new NotFoundException("Wrong task id")),
+                userRepository.findById(request.userId()).orElseThrow(()->new NotFoundException("Wrong user id")),
+                LocalDate.now()
+        );
+        repository.save(comment);
+        return mapper.mapTo(comment);
+    }
+}
