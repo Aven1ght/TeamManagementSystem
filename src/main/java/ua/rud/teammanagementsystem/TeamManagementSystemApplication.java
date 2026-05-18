@@ -14,8 +14,6 @@ public class TeamManagementSystemApplication {
         SpringApplication.run(TeamManagementSystemApplication.class, args);
 
         //тестування
-        //кешування
-        //підключити докер
     }
 
 }

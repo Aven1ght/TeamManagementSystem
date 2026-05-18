@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import ua.rud.teammanagementsystem.Exceptions.NotFoundException;
 import ua.rud.teammanagementsystem.Mappers.ProjectMapper;
@@ -15,7 +14,6 @@ import ua.rud.teammanagementsystem.Requests.ProjectRequest;
 import ua.rud.teammanagementsystem.Responses.ProjectResponse;
 import ua.rud.teammanagementsystem.entity.Project;
 
-import java.time.Duration;
 
 
 @Service
@@ -25,7 +23,6 @@ public class ProjectService {
 private final ProjectMapper mapper;
 private final ProjectRepository repository;
 private final Logger log = LoggerFactory.getLogger(ProjectService.class);
-private final RedisTemplate<String, Object> redisTemplate;
 private final CacheService cacheService;
     public Page<ProjectResponse> getAllProjects(Pageable pageable) {
         log.info("All project got successfully");

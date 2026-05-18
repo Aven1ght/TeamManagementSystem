@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import ua.rud.teammanagementsystem.Enums.TaskStatus;
 import ua.rud.teammanagementsystem.Exceptions.NotFoundException;
@@ -18,7 +17,6 @@ import ua.rud.teammanagementsystem.Requests.TaskRequest;
 import ua.rud.teammanagementsystem.Responses.TaskResponse;
 import ua.rud.teammanagementsystem.entity.Task;
 
-import java.time.Duration;
 import java.time.LocalDate;
 
 @Service
@@ -30,7 +28,6 @@ public class TaskService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final Logger log = LoggerFactory.getLogger(TaskService.class);
-    private final RedisTemplate<String, Object> redisTemplate;
     private final CacheService cacheService;
 
     public Page<TaskResponse> getAllTasks(Pageable pageable) {
