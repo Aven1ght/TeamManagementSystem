@@ -2,6 +2,8 @@ package ua.rud.teammanagementsystem.Security;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,7 +20,7 @@ public class AuthenticationService {
     private final PasswordEncoder encoder;
     private final JwtService jwtService;
     private final AuthenticationManager manager;
-
+    private final Logger log = LoggerFactory.getLogger(AuthenticationService.class);
 
     public AuthenticationResponse register(AuthenticationRequest request){
         User user = User.builder()
@@ -29,6 +31,7 @@ public class AuthenticationService {
                 .build();
         userRepository.save(user);
         String jwt = jwtService.generateToken(user);
+        log.info("New user {} registered successfully", request.getName());
         return AuthenticationResponse.builder().token(jwt).build();
     }
     public AuthenticationResponse authenticate(AuthenticationRequest request){
@@ -44,7 +47,7 @@ public class AuthenticationService {
                 .orElseThrow();
 
         String jwt = jwtService.generateToken(user);
-
+        log.info("User {} was successfully authenticated", request.getName());
         return AuthenticationResponse.builder()
                 .token(jwt)
                 .build();

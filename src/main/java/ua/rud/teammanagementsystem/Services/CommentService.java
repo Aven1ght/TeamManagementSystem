@@ -26,13 +26,15 @@ private final CommentMapper mapper;
 private final CommentRepository repository;
 private final TaskRepository taskRepository;
 private final UserRepository userRepository;
-
+private final Logger log = LoggerFactory.getLogger(CommentService.class);
     public Page<CommentResponse> getAllComments(Pageable pageable) {
+        log.info("All comments got successfully");
         return repository.findAll(pageable).map(mapper::mapTo);
     }
 
     public CommentResponse getById(Long id) {
         Comment comment = repository.findById(id).orElseThrow(()->new NotFoundException("Wrong id"));
+        log.info("Comment with id {} got successfully", id);
         return mapper.mapTo(comment);
     }
 
@@ -45,6 +47,7 @@ private final UserRepository userRepository;
                 LocalDate.now()
         );
         repository.save(comment);
+        log.info("New comment {} created successfully", request.text());
         return mapper.mapTo(comment);
     }
 }

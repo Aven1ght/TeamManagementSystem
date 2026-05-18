@@ -2,6 +2,8 @@ package ua.rud.teammanagementsystem.Services;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,18 +17,22 @@ import ua.rud.teammanagementsystem.Responses.UserResponse;
 public class UserService {
 private final UserMapper mapper;
 private final UserRepository repository;
+private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     public Page<UserResponse> getAllUsers(Pageable pageable) {
+        log.info("All user got successfully");
         return repository.findAll(pageable).map(mapper::mapTo);
     }
 
     public UserResponse getUserById(Long id) {
+        log.info("User with id {} got successfully", id);
     return mapper.mapTo(repository.findById(id).orElseThrow(()-> new NotFoundException("Wrong id")));
     }
 
     @Transactional
     public void deleteUser(Long id) {
        User user =  repository.findById(id).orElseThrow(()-> new NotFoundException("Wrong id"));
+       log.info("User with id {} deleted successfully", id);
        repository.delete(user);
     }
 }
