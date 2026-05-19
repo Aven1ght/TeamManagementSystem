@@ -42,5 +42,16 @@ public class TaskController {
         log.info("Called change task with id {}", id);
         return service.changeTask(id, request);
     }
+    @PostMapping("/assign/{id}")
+    public TaskResponse assignTask(@PathVariable Long id){
+        log.info("Called assign task with id {} to current user", id);
+        return service.assignTask(id);
+    }
+
+    @PostMapping("/finish/{id}")
+    public TaskResponse finishTask(@PathVariable Long id){
+        log.info("Called finish task for current user");
+        return service.finishTask(id);
+    }
 
 }

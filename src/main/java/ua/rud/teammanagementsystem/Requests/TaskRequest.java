@@ -6,7 +6,6 @@ public record TaskRequest(
         String tittle,
         String description,
         TaskPriority priority,
-        Long project_id,
-        Long user_id
+        Long project_id
 ) {
 }

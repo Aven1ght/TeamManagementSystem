@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import ua.rud.teammanagementsystem.Exceptions.BadRequest;
 import ua.rud.teammanagementsystem.Exceptions.NotFoundException;
 import ua.rud.teammanagementsystem.Mappers.CommentMapper;
 import ua.rud.teammanagementsystem.Repositories.CommentRepository;
@@ -48,6 +49,9 @@ private final CacheService cacheService;
     }
 
     public CommentResponse createComment(CommentRequest request) {
+        if(request.text() == null){
+            throw new BadRequest("You can't create comment without text");
+        }
         Comment comment = new Comment(
                 null,
                 request.text(),

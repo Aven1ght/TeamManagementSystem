@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ua.rud.teammanagementsystem.Exceptions.BadRequest;
 import ua.rud.teammanagementsystem.Exceptions.NotFoundException;
 import ua.rud.teammanagementsystem.Mappers.ProjectMapper;
 import ua.rud.teammanagementsystem.Repositories.ProjectRepository;
@@ -43,6 +44,9 @@ private final CacheService cacheService;
     }
 
     public ProjectResponse createProject(ProjectRequest request) {
+        if(request.name() == null){
+            throw new BadRequest("You can't create new project without name");
+        }
         Project project = new Project(null, request.name(), request.description());
         repository.save(project);
         log.info("New project {} created successfully", request.name());

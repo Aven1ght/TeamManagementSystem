@@ -6,8 +6,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import ua.rud.teammanagementsystem.Enums.TaskPriority;
 import ua.rud.teammanagementsystem.Enums.TaskStatus;
+import ua.rud.teammanagementsystem.Exceptions.BadRequest;
+import ua.rud.teammanagementsystem.Exceptions.ConflictRequest;
 import ua.rud.teammanagementsystem.Exceptions.NotFoundException;
 import ua.rud.teammanagementsystem.Mappers.TaskMapper;
 import ua.rud.teammanagementsystem.Repositories.ProjectRepository;
@@ -16,6 +22,7 @@ import ua.rud.teammanagementsystem.Repositories.UserRepository;
 import ua.rud.teammanagementsystem.Requests.TaskRequest;
 import ua.rud.teammanagementsystem.Responses.TaskResponse;
 import ua.rud.teammanagementsystem.entity.Task;
+import ua.rud.teammanagementsystem.entity.User;
 
 import java.time.LocalDate;
 
@@ -49,6 +56,16 @@ public class TaskService {
     }
 
     public TaskResponse createTask(TaskRequest request) {
+        if(request.tittle() == null){
+            throw new BadRequest("You can't create new task without tittle");
+        }
+        if(
+                request.priority() != TaskPriority.LOW &&
+                request.priority() != TaskPriority.MEDIUM &&
+                request.priority() != TaskPriority.HIGH
+        ){
+            throw new BadRequest("You can't create task with this priority");
+        }
     Task task = new Task(
             null,
             request.tittle(),
@@ -57,7 +74,7 @@ public class TaskService {
             request.priority(),
             LocalDate.now().plusDays(20),
             projectRepository.findById(request.project_id()).orElseThrow(()->new NotFoundException("Wrong project id")),
-            userRepository.findById(request.user_id()).orElseThrow(()->new NotFoundException("Wrong user id"))
+            null
     );
     repository.save(task);
     log.info("Task {} created successfully", request.tittle());
@@ -81,11 +98,41 @@ public class TaskService {
                 request.priority(),
                 task.getDeadline(),
                 projectRepository.findById(request.project_id()).orElseThrow(()->new NotFoundException("Wrong project id")),
-                userRepository.findById(request.user_id()).orElseThrow(()->new NotFoundException("Wrong user id"))
+                null
         );
         repository.save(changedTask);
         cacheService.delete(id.toString());
         log.info("Task with id {} changed successfully", id);
         return mapper.mapTo(changedTask);
+    }
+
+    public TaskResponse assignTask(Long id) {
+       Task task = repository.findById(id).orElseThrow(()-> new NotFoundException("Wrong task id"));
+
+       if(task.getStatus() != TaskStatus.CREATED){
+           throw new ConflictRequest("You can't take this task");
+       }
+       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+       String username = authentication.getName();
+       User currentUser = userRepository.findByUsername(username).orElseThrow(()->new NotFoundException("Wrong username"));
+
+       task.setUser(currentUser);
+       task.setStatus(TaskStatus.ACTIVE);
+        return mapper.mapTo(task);
+    }
+
+    public TaskResponse finishTask(Long id) {
+        Task task = repository.findById(id).orElseThrow(()-> new NotFoundException("Wrong task id"));
+        if(task.getStatus() != TaskStatus.ACTIVE){
+            throw new ConflictRequest("You can't finish this task");
+        }
+        if(LocalDate.now().isAfter(task.getDeadline())){
+            task.setStatus(TaskStatus.OVERDATED);
+        }else {
+            task.setStatus(TaskStatus.COMPLETED);
+        }
+
+        return mapper.mapTo(task);
+
     }
 }
