@@ -63,4 +63,11 @@ private final CacheService cacheService;
         log.info("New comment {} created successfully", request.text());
         return mapper.mapTo(comment);
     }
+
+    public void deleteComment(Long id) {
+        Comment commentToDelete = repository.findById(id).orElseThrow(()-> new  NotFoundException("Wrong comment id"));
+        repository.delete(commentToDelete);
+        cacheService.delete(id.toString());
+        log.info("Comment deleted successfully");
+    }
 }

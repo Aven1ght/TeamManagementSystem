@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+import ua.rud.teammanagementsystem.Requests.TaskChangeRequest;
 import ua.rud.teammanagementsystem.Requests.TaskRequest;
 import ua.rud.teammanagementsystem.Responses.TaskResponse;
 import ua.rud.teammanagementsystem.Services.TaskService;
@@ -38,7 +39,7 @@ public class TaskController {
         service.deleteTask(id);
     }
     @PutMapping("/{id}")
-    public TaskResponse changeTask(@PathVariable Long id, @RequestBody TaskRequest request){
+    public TaskResponse changeTask(@PathVariable Long id, @RequestBody TaskChangeRequest request){
         log.info("Called change task with id {}", id);
         return service.changeTask(id, request);
     }

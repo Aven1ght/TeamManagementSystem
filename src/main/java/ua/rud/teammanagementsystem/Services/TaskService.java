@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ua.rud.teammanagementsystem.Enums.TaskPriority;
 import ua.rud.teammanagementsystem.Enums.TaskStatus;
@@ -19,6 +18,7 @@ import ua.rud.teammanagementsystem.Mappers.TaskMapper;
 import ua.rud.teammanagementsystem.Repositories.ProjectRepository;
 import ua.rud.teammanagementsystem.Repositories.TaskRepository;
 import ua.rud.teammanagementsystem.Repositories.UserRepository;
+import ua.rud.teammanagementsystem.Requests.TaskChangeRequest;
 import ua.rud.teammanagementsystem.Requests.TaskRequest;
 import ua.rud.teammanagementsystem.Responses.TaskResponse;
 import ua.rud.teammanagementsystem.entity.Task;
@@ -88,7 +88,7 @@ public class TaskService {
         repository.delete(task);
     }
 
-    public TaskResponse changeTask(Long id, TaskRequest request) {
+    public TaskResponse changeTask(Long id, TaskChangeRequest request) {
         Task task = repository.findById(id).orElseThrow(()->new NotFoundException("Wrong id"));
         Task changedTask = new Task(
                 task.getId(),
@@ -98,7 +98,7 @@ public class TaskService {
                 request.priority(),
                 task.getDeadline(),
                 projectRepository.findById(request.project_id()).orElseThrow(()->new NotFoundException("Wrong project id")),
-                null
+                userRepository.findById(request.user_id()).orElseThrow(()-> new NotFoundException("Wrong user id"))
         );
         repository.save(changedTask);
         cacheService.delete(id.toString());
@@ -113,12 +113,11 @@ public class TaskService {
            throw new ConflictRequest("You can't take this task");
        }
        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-       String username = authentication.getName();
-       User currentUser = userRepository.findByUsername(username).orElseThrow(()->new NotFoundException("Wrong username"));
+       User currentUser = userRepository.findByUsername(authentication.getName()).orElseThrow(()->new NotFoundException("Wrong username"));
 
        task.setUser(currentUser);
        task.setStatus(TaskStatus.ACTIVE);
-        return mapper.mapTo(task);
+       return mapper.mapTo(task);
     }
 
     public TaskResponse finishTask(Long id) {

@@ -31,5 +31,10 @@ private final Logger log = LoggerFactory.getLogger(CommentController.class);
         log.info("Called create new comment {}", request.text());
         return service.createComment(request);
     }
+    @DeleteMapping("/{id}")
+    public void deleteComment(@PathVariable Long id){
+        log.info("Called delete comment with id {}", id);
+        service.deleteComment(id);
+    }
 
 }
