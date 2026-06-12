@@ -63,7 +63,7 @@ public class TaskServiceTests {
     }
 
     @Test
-    public void getAllTasksTest_happyPath() {
+    public void getAllTasksTest() {
         Pageable pageable;
         pageable = PageRequest.of(0, 10);
 

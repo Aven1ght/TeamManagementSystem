@@ -48,8 +48,8 @@ private final CacheService cacheService;
             throw new BadRequest("You can't create new project without name");
         }
         Project project = new Project(null, request.name(), request.description());
-        repository.save(project);
+        Project savedProject = repository.save(project);
         log.info("New project {} created successfully", request.name());
-        return mapper.mapTo(project);
+        return mapper.mapTo(savedProject);
     }
 }
