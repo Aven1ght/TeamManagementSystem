@@ -56,8 +56,8 @@ public class TaskService {
     }
 
     public TaskResponse createTask(TaskRequest request) {
-        if(request.tittle() == null){
-            throw new BadRequest("You can't create new task without tittle");
+        if(request.title() == null){
+            throw new BadRequest("You can't create new task without title");
         }
         if(
                 request.priority() != TaskPriority.LOW &&
@@ -68,7 +68,7 @@ public class TaskService {
         }
     Task task = new Task(
             null,
-            request.tittle(),
+            request.title(),
             request.description(),
             TaskStatus.CREATED,
             request.priority(),
@@ -77,7 +77,7 @@ public class TaskService {
             null
     );
     repository.save(task);
-    log.info("Task {} created successfully", request.tittle());
+    log.info("Task {} created successfully", request.title());
     return mapper.mapTo(task);
     }
 
@@ -92,7 +92,7 @@ public class TaskService {
         Task task = repository.findById(id).orElseThrow(()->new NotFoundException("Wrong id"));
         Task changedTask = new Task(
                 task.getId(),
-                request.tittle(),
+                request.title(),
                 request.description(),
                 task.getStatus(),
                 request.priority(),

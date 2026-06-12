@@ -1,6 +1,5 @@
 package ua.rud.teammanagementsystem.Controllers;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,7 @@ public class TaskController {
     }
     @PostMapping
     public TaskResponse createTask(@RequestBody TaskRequest request){
-        log.info("Called create new task {}", request.tittle());
+        log.info("Called create new task {}", request.title());
         return service.createTask(request);
     }
     @DeleteMapping("/{id}")
