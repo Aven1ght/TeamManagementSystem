@@ -1,5 +1,6 @@
 package ua.rud.teammanagementsystem.Controllers;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,8 @@ import ua.rud.teammanagementsystem.Services.ProjectService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/projects")
+@SecurityRequirement(name = "bearerAuth")
+
 public class ProjectController {
     private final ProjectService service;
     private final Logger log = LoggerFactory.getLogger(ProjectController.class);

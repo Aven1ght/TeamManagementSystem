@@ -1,5 +1,6 @@
 package ua.rud.teammanagementsystem.Controllers;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import ua.rud.teammanagementsystem.Services.CommentService;
 @RequiredArgsConstructor
 @RequestMapping("/comments")
 @RestController
+@SecurityRequirement(name = "bearerAuth")
 public class CommentController {
 private final CommentService service;
 private final Logger log = LoggerFactory.getLogger(CommentController.class);

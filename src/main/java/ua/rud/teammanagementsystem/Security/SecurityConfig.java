@@ -36,7 +36,12 @@ public SecurityFilterChain filterChain(HttpSecurity http){
     http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth ->
-                    auth.requestMatchers("/auth/**").permitAll()
+                    auth.requestMatchers(
+                            "/auth/**",
+                                    "/swagger-ui/**",
+                                    "/v3/api-docs/**",
+                                    "/swagger-ui.html"
+                            ).permitAll()
                             .anyRequest().hasRole("USER")
             )
             .sessionManagement(session ->
