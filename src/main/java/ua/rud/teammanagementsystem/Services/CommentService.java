@@ -59,9 +59,9 @@ private final CacheService cacheService;
                 userRepository.findById(request.userId()).orElseThrow(()->new NotFoundException("Wrong user id")),
                 LocalDate.now()
         );
-        repository.save(comment);
+        Comment saved = repository.save(comment);
         log.info("New comment {} created successfully", request.text());
-        return mapper.mapTo(comment);
+        return mapper.mapTo(saved);
     }
 
     public void deleteComment(Long id) {

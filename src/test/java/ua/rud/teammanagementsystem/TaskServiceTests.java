@@ -43,7 +43,8 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class TaskServiceTests {
+public class
+TaskServiceTests {
     @Mock
     private TaskMapper mapper;
     @Mock
