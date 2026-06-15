@@ -77,7 +77,6 @@ http://localhost:8080/swagger-ui/index.html
 1. Clone repository
 
 ```bash
-git clone https://github.com/yourname/team-management-system.git
 ```
 2. Run containers
 ```bash
@@ -97,7 +96,6 @@ The project contains:
 
 Current coverage:
 - 45+ tests
-- 
 ## What I Learned
 
 Through this project I gained practical experience with:
