@@ -97,7 +97,7 @@ The project contains:
 
 Current coverage:
 - 45+ tests
-- 
+
 ## What I Learned
 
 Through this project I gained practical experience with:
