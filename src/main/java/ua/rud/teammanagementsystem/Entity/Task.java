@@ -2,8 +2,8 @@ package ua.rud.teammanagementsystem.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ua.rud.teammanagementsystem.Enums.TaskPriority;
-import ua.rud.teammanagementsystem.Enums.TaskStatus;
+import ua.rud.teammanagementsystem.enums.TaskPriority;
+import ua.rud.teammanagementsystem.enums.TaskStatus;
 
 import java.time.LocalDate;
 

@@ -9,21 +9,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import ua.rud.teammanagementsystem.Enums.Role;
-import ua.rud.teammanagementsystem.Exceptions.BadRequest;
-import ua.rud.teammanagementsystem.Exceptions.NotFoundException;
-import ua.rud.teammanagementsystem.Responses.UserResponse;
-import ua.rud.teammanagementsystem.Services.CacheService;
-import ua.rud.teammanagementsystem.Mappers.UserMapper;
-import ua.rud.teammanagementsystem.Repositories.UserRepository;
-import ua.rud.teammanagementsystem.Services.CacheService;
-import ua.rud.teammanagementsystem.Services.UserService;
+import ua.rud.teammanagementsystem.enums.Role;
+import ua.rud.teammanagementsystem.exceptions.NotFoundException;
+import ua.rud.teammanagementsystem.responses.UserResponse;
+import ua.rud.teammanagementsystem.services.CacheService;
+import ua.rud.teammanagementsystem.mappers.UserMapper;
+import ua.rud.teammanagementsystem.repositories.UserRepository;
+import ua.rud.teammanagementsystem.services.UserService;
 import ua.rud.teammanagementsystem.entity.User;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalLong;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

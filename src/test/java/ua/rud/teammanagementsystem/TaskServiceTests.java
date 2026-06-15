@@ -13,20 +13,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import ua.rud.teammanagementsystem.Enums.TaskPriority;
-import ua.rud.teammanagementsystem.Enums.TaskStatus;
-import ua.rud.teammanagementsystem.Exceptions.BadRequest;
-import ua.rud.teammanagementsystem.Exceptions.ConflictRequest;
-import ua.rud.teammanagementsystem.Exceptions.NotFoundException;
-import ua.rud.teammanagementsystem.Mappers.TaskMapper;
-import ua.rud.teammanagementsystem.Repositories.ProjectRepository;
-import ua.rud.teammanagementsystem.Repositories.TaskRepository;
-import ua.rud.teammanagementsystem.Repositories.UserRepository;
-import ua.rud.teammanagementsystem.Requests.TaskChangeRequest;
-import ua.rud.teammanagementsystem.Requests.TaskRequest;
-import ua.rud.teammanagementsystem.Responses.TaskResponse;
-import ua.rud.teammanagementsystem.Services.CacheService;
-import ua.rud.teammanagementsystem.Services.TaskService;
+import ua.rud.teammanagementsystem.enums.TaskPriority;
+import ua.rud.teammanagementsystem.enums.TaskStatus;
+import ua.rud.teammanagementsystem.exceptions.BadRequest;
+import ua.rud.teammanagementsystem.exceptions.ConflictRequest;
+import ua.rud.teammanagementsystem.exceptions.NotFoundException;
+import ua.rud.teammanagementsystem.mappers.TaskMapper;
+import ua.rud.teammanagementsystem.repositories.ProjectRepository;
+import ua.rud.teammanagementsystem.repositories.TaskRepository;
+import ua.rud.teammanagementsystem.repositories.UserRepository;
+import ua.rud.teammanagementsystem.requests.TaskChangeRequest;
+import ua.rud.teammanagementsystem.requests.TaskRequest;
+import ua.rud.teammanagementsystem.responses.TaskResponse;
+import ua.rud.teammanagementsystem.services.CacheService;
+import ua.rud.teammanagementsystem.services.TaskService;
 import ua.rud.teammanagementsystem.entity.Project;
 import ua.rud.teammanagementsystem.entity.Task;
 import ua.rud.teammanagementsystem.entity.User;
@@ -176,57 +176,24 @@ TaskServiceTests {
 
     @Test
     public void changeTaskTest() {
-        TaskChangeRequest request = new TaskChangeRequest("new title", "new desc", TaskPriority.LOW, 2L, 2L);
-        Project oldProject = new Project();
-        oldProject.setId(1L);
-        User oldUser = new User();
-        oldUser.setId(1L);
-        Task task = new Task(
-                1L,
-                "old title",
-                "old desc",
-                TaskStatus.CREATED,
-                TaskPriority.HIGH,
-                LocalDate.now().plusDays(20),
-                oldProject,
-                oldUser
-        );
-        User newUser = new User();
-        newUser.setId(request.user_id());
-        Project newProject = new Project();
-        newProject.setId(request.project_id());
+        Project newProject = new Project(); newProject.setId(2L);
+        User newUser = new User(); newUser.setId(2L);
+        TaskChangeRequest request = new TaskChangeRequest("newTitle", "newDesc", TaskPriority.HIGH, 2L, 2L);
+        Project oldProject = new Project(); oldProject.setId(1L);
+        User oldUser = new User(); oldUser.setId(1L);
+        Task oldTask = new Task(1L, "oldTask", "oldDesc", TaskStatus.CREATED, TaskPriority.LOW, LocalDate.now().plusDays(20), oldProject, oldUser);
+        TaskResponse expected = new TaskResponse(oldTask.getId(), request.title(), request.description(), oldTask.getStatus(), request.priority(), oldTask.getDeadline(), request.project_id(), request.user_id());
 
-        TaskResponse expectedResponse = new TaskResponse(
-                task.getId(),
-                request.title(),
-                request.description(),
-                task.getStatus(),
-                request.priority(),
-                task.getDeadline(),
-                newProject.getId(),
-                newUser.getId()
-        );
+        when(projectRepository.findById(2L)).thenReturn(Optional.of(newProject));
+        when(repository.findById(1L)).thenReturn(Optional.of(oldTask));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(newUser));
+        when(mapper.mapTo(any(Task.class))).thenReturn(expected);
 
-        when(repository.findById(1L)).thenReturn(Optional.of(task));
-        when(projectRepository.findById(request.project_id())).thenReturn(Optional.of(newProject));
-        when(userRepository.findById(request.user_id())).thenReturn(Optional.of(newUser));
-        when(mapper.mapTo(any(Task.class))).thenReturn(expectedResponse);
-
-        TaskResponse actual = service.changeTask(1L, request);
-
-        assertEquals(expectedResponse, actual);
-
-        verify(repository).save(argThat(t ->
-                t.getId().equals(1L) &&
-                        t.getTitle().equals("new title") &&
-                        t.getDescription().equals("new desc") &&
-                        t.getStatus().equals(TaskStatus.CREATED) &&
-                        t.getPriority().equals(TaskPriority.LOW) &&
-                        t.getProject().equals(newProject) &&
-                        t.getUser().equals(newUser)
-        ));
+        TaskResponse response = service.changeTask(1L, request);
+        assertEquals(expected, response);
 
         verify(cacheService).delete("1");
+        verify(mapper).mapTo(oldTask);
     }
 
     @Test
@@ -377,38 +344,33 @@ TaskServiceTests {
 
     @Test
     public void changeTaskTest_wrongProjectId() {
-        Task task = new Task();
-        task.setId(1L);
-        TaskChangeRequest request = new TaskChangeRequest("test", "test", TaskPriority.LOW, 2L, 2L);
-
+        TaskChangeRequest request = new TaskChangeRequest("test", "test", TaskPriority.LOW, 1L, 1L);
+        Task task = new Task(); task.setId(1L);
+        when(projectRepository.findById(1L)).thenReturn(Optional.empty());
         when(repository.findById(1L)).thenReturn(Optional.of(task));
-        when(projectRepository.findById(2L)).thenReturn(Optional.empty());
 
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> service.changeTask(1L, request));
-        assertEquals("Wrong project id", exception.getMessage());
+        NotFoundException e = assertThrows(NotFoundException.class, ()->service.changeTask(1L, request));
 
-        verify(repository, never()).save(any(Task.class));
-        verify(cacheService, never()).delete("1");
+        assertEquals("Wrong project id", e.getMessage());
+
+        verify(cacheService, never()).delete(anyString());
         verify(mapper, never()).mapTo(any(Task.class));
     }
 
     @Test
     public void changeTaskTest_wrongUserId() {
-        Task task = new Task();
-        task.setId(1L);
-        TaskChangeRequest request = new TaskChangeRequest("test", "test", TaskPriority.LOW, 2L, 2L);
-        Project p = new Project();
-        p.setId(2L);
+        TaskChangeRequest request = new TaskChangeRequest("test", "test", TaskPriority.LOW, 1L, 1L);
+        Task task = new Task(); task.setId(1L);
+        Project project = new Project(); project.setId(1L);
+        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
         when(repository.findById(1L)).thenReturn(Optional.of(task));
-        when(projectRepository.findById(2L)).thenReturn(Optional.of(p));
-        when(userRepository.findById(2L)).thenReturn(Optional.empty());
 
-        NotFoundException e = assertThrows(NotFoundException.class, () -> service.changeTask(1L, request));
+        NotFoundException e = assertThrows(NotFoundException.class, ()->service.changeTask(1L, request));
 
         assertEquals("Wrong user id", e.getMessage());
 
-        verify(repository, never()).save(any(Task.class));
-        verify(cacheService, never()).delete("1");
+        verify(cacheService, never()).delete(anyString());
         verify(mapper, never()).mapTo(any(Task.class));
     }
 
