@@ -77,7 +77,7 @@ http://localhost:8080/swagger-ui/index.html
 1. Clone repository
 
 ```bash
-git clone https://github.com/yourname/team-management-system.git
+git clone https://github.com/Aven1ght/TeamManagementSystem.git
 ```
 2. Run containers
 ```bash
@@ -85,7 +85,7 @@ docker compose up -d
 ```
 3. Start application
 ```bash
-   mvn spring-boot:run
+mvn spring-boot:run
 ```
 
 ## Testing
