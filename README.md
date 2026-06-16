@@ -64,7 +64,7 @@ Additional components:
 
 ## Database Schema
 
-![Database Schema](DB.jpg)
+![Database Schema](docs/imagesDB.jpg)
 
 ## API Documentation
 
