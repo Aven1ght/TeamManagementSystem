@@ -52,4 +52,9 @@ private final CacheService cacheService;
         log.info("New project {} created successfully", request.name());
         return mapper.mapTo(savedProject);
     }
+
+    public void delete(Long id) {
+        Project projectToDelete = repository.findById(id).orElseThrow(()-> new NotFoundException("Wrong project id"));
+        repository.delete(projectToDelete);
+    }
 }

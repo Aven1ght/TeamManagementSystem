@@ -121,6 +121,16 @@ public class ProjectServiceTests {
         ));
     }
     @Test
+    public void deleteProjectTest(){
+        Project p = new Project(); p.setId(1L);
+
+        when(repository.findById(1L)).thenReturn(Optional.of(p));
+
+        service.delete(1L);
+
+        verify(repository).delete(p);
+    }
+    @Test
     public void getAllProjects_emptyPage(){
         Pageable pageable = PageRequest.of(0, 10);
         Page<Project> emptyPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
@@ -155,5 +165,13 @@ public class ProjectServiceTests {
         assertEquals("You can't create new project without name", e.getMessage());
 
         verify(repository, never()).save(any(Project.class));
+    }
+    @Test
+    public void deleteProjectTest_wrongId(){
+        when(repository.findById(1L)).thenReturn(Optional.empty());
+        NotFoundException e = assertThrows(NotFoundException.class, ()->service.delete(1L));
+        assertEquals("Wrong project id", e.getMessage());
+
+        verify(repository, never()).delete(any());
     }
 }

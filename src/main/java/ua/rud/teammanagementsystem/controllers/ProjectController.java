@@ -37,4 +37,8 @@ public class ProjectController {
         log.info("Called create new project {}", request.name());
         return service.createProject(request);
     }
+    @DeleteMapping("/{id}")
+    private void deleteProject(@PathVariable Long id){
+        service.delete(id);
+    }
 }
