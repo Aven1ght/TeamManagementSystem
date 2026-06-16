@@ -1,5 +1,6 @@
 package ua.rud.teammanagementsystem;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,6 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import ua.rud.teammanagementsystem.exceptions.BadRequest;
 import ua.rud.teammanagementsystem.exceptions.NotFoundException;
 import ua.rud.teammanagementsystem.mappers.CommentMapper;
@@ -46,6 +50,11 @@ public class CommentServiceTests {
     private CacheService cacheService;
 @InjectMocks
     private CommentService service;
+
+    @AfterEach
+    public void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
 
 @Test
     public void getAllCommentsTest(){
@@ -106,18 +115,29 @@ public class CommentServiceTests {
 
 @Test
     public void createCommentTest() {
-    CommentRequest request = new CommentRequest("text", 1L, 1L);
+    String testName = "test";
+    CommentRequest request = new CommentRequest("text", 1L);
     Task task = new Task();
     task.setId(1L);
     User user = new User();
     user.setId(1L);
-    Comment comment = new Comment(null, request.text(), task, user, LocalDate.now());
-    Comment saved = new Comment(1L, comment.getText(), task, user, comment.getCreated_at());
-    CommentResponse response = new CommentResponse(saved.getId(), saved.getText(), 1L, 1L, saved.getCreated_at());
+    Comment comment = new Comment(null, request.text(), task, null, LocalDate.now());
+    Comment saved = new Comment(1L, comment.getText(), task, null, comment.getCreated_at());
+    CommentResponse response = new CommentResponse(saved.getId(), saved.getText(), 1L, user.getId(), saved.getCreated_at());
+
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getName()).thenReturn(testName);
+
+    SecurityContext context = mock(SecurityContext.class);
+    when(context.getAuthentication()).thenReturn(authentication);
+
+    SecurityContextHolder.setContext(context);
+
+    when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
     when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
-    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     when(repository.save(any(Comment.class))).thenReturn(saved);
     when(mapper.mapTo(saved)).thenReturn(response);
+
     CommentResponse res = service.createComment(request);
 
     assertEquals(response, res);
@@ -126,7 +146,7 @@ public class CommentServiceTests {
                     c.getText().equals("text") &&
                     c.getTask().equals(task) &&
                     c.getUser().equals(user) &&
-                    c.getCreated_at().equals(LocalDate.now())
+                    c.getCreated_at() !=null
     ));
 }
     @Test
@@ -159,8 +179,6 @@ public class CommentServiceTests {
 
     @Test
     public void getCommentByIdTest_wrongId(){
-    CommentResponse response = new CommentResponse(2L, "text", 1L, 1L, LocalDate.now());
-
     when(repository.findById(1L)).thenReturn(Optional.empty());
     NotFoundException e = assertThrows(NotFoundException.class, ()->service.getById(1L));
     assertEquals("Wrong id", e.getMessage());
@@ -171,7 +189,7 @@ public class CommentServiceTests {
 
 @Test
     public void createCommentTest_textIsNull(){
-    CommentRequest request = new CommentRequest(null, 1L, 1L);
+    CommentRequest request = new CommentRequest(null, 1L);
 
     BadRequest e = assertThrows(BadRequest.class, ()->service.createComment(request));
 

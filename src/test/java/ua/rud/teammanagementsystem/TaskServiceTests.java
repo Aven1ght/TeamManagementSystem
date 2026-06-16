@@ -433,7 +433,7 @@ TaskServiceTests {
         when(repository.findById(1L)).thenReturn(Optional.of(task));
         NotFoundException e = assertThrows(NotFoundException.class, () -> service.assignTask(1L));
 
-        assertEquals("Wrong username", e.getMessage());
+        assertEquals("User is not authenticated", e.getMessage());
 
         verify(mapper, never()).mapTo(any(Task.class));
     }

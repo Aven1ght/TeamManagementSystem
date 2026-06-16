@@ -6,7 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import ua.rud.teammanagementsystem.entity.User;
 import ua.rud.teammanagementsystem.exceptions.BadRequest;
 import ua.rud.teammanagementsystem.exceptions.NotFoundException;
 import ua.rud.teammanagementsystem.mappers.CommentMapper;
@@ -18,6 +21,7 @@ import ua.rud.teammanagementsystem.responses.CommentResponse;
 import ua.rud.teammanagementsystem.entity.Comment;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -51,11 +55,18 @@ private final CacheService cacheService;
         if(request.text() == null){
             throw new BadRequest("You can't create comment without text");
         }
+        String username = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .map(Authentication::getName)
+                .orElseThrow(() -> new NotFoundException("User is not authenticated"));
+
+        User currentUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("Wrong username"));
+
         Comment comment = new Comment(
                 null,
                 request.text(),
                 taskRepository.findById(request.taskId()).orElseThrow(()->new NotFoundException("Wrong task id")),
-                userRepository.findById(request.userId()).orElseThrow(()->new NotFoundException("Wrong user id")),
+                currentUser,
                 LocalDate.now()
         );
         Comment saved = repository.save(comment);

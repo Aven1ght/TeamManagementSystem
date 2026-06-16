@@ -25,6 +25,7 @@ import ua.rud.teammanagementsystem.entity.Task;
 import ua.rud.teammanagementsystem.entity.User;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -108,8 +109,12 @@ public class TaskService {
        if(task.getStatus() != TaskStatus.CREATED){
            throw new ConflictRequest("You can't take this task");
        }
-       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-       User currentUser = userRepository.findByUsername(authentication.getName()).orElseThrow(()->new NotFoundException("Wrong username"));
+        String username = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .map(Authentication::getName)
+                .orElseThrow(() -> new NotFoundException("User is not authenticated"));
+
+        User currentUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("Wrong username"));
 
        task.setUser(currentUser);
        task.setStatus(TaskStatus.ACTIVE);
