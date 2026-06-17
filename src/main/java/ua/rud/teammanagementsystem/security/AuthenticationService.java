@@ -22,7 +22,7 @@ public class AuthenticationService {
     private final AuthenticationManager manager;
     private final Logger log = LoggerFactory.getLogger(AuthenticationService.class);
 
-    public AuthenticationResponse register(AuthenticationRequest request){
+    public AuthenticationResponse register(RegistrationRequest request){
         User user = User.builder()
                 .username(request.getName())
                 .password(encoder.encode(request.getPassword()))
@@ -51,5 +51,18 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .token(jwt)
                 .build();
+    }
+
+    public AuthenticationResponse registerAdmin(RegistrationRequest request) {
+        User user = User.builder()
+                .username(request.getName())
+                .password(encoder.encode(request.getPassword()))
+                .email(request.getEmail())
+                .role(Role.ADMIN)
+                .build();
+        userRepository.save(user);
+        String jwt = jwtService.generateToken(user);
+        log.info("New admin {} registered successfully", request.getName());
+        return AuthenticationResponse.builder().token(jwt).build();
     }
 }

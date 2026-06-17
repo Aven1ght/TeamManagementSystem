@@ -15,9 +15,14 @@ public class AuthenticationController {
     private final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
     private final AuthenticationService service;
     @PostMapping("/register")
-    public AuthenticationResponse register(@RequestBody AuthenticationRequest request){
+    public AuthenticationResponse register(@RequestBody RegistrationRequest request){
         log.info("Called register new user");
        return service.register(request);
+    }
+    @PostMapping("/register/admin")
+    public AuthenticationResponse registerAdmin(@RequestBody RegistrationRequest request){
+        log.info("Called register new admin");
+        return service.registerAdmin(request);
     }
     @PostMapping("/authenticate")
     public AuthenticationResponse authenticate(@RequestBody AuthenticationRequest request){
