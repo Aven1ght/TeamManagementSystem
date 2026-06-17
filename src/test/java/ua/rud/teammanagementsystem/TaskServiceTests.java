@@ -247,12 +247,25 @@ TaskServiceTests {
         p.setId(1L);
         User u = new User();
         u.setId(1L);
+        String testName= "test";
+
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getName()).thenReturn(testName);
+
+        SecurityContext context = mock(SecurityContext.class);
+        when(context.getAuthentication()).thenReturn(authentication);
+
+        SecurityContextHolder.setContext(context);
+        User user = new User();
+        user.setId(1L);
+        user.setUsername(testName);
+
 
         Task task = new Task(1L, "test", "test", TaskStatus.ACTIVE, TaskPriority.LOW, LocalDate.now().plusDays(20), p, u);
         TaskResponse expected = new TaskResponse(task.getId(), task.getTitle(), task.getDescription(), TaskStatus.COMPLETED, task.getPriority(), task.getDeadline(), p.getId(), u.getId());
         when(repository.findById(1L)).thenReturn(Optional.of(task));
         when(mapper.mapTo(any(Task.class))).thenReturn(expected);
-
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         TaskResponse actual = service.finishTask(1L);
 
         assertEquals(expected, actual);
@@ -439,6 +452,21 @@ TaskServiceTests {
     }
 
     @Test
+    public void assignTaskTest_taskAAlreadyAssigned(){
+        Task task = new Task();
+        task.setId(1L);
+        task.setUser(new User());
+        task.setStatus(TaskStatus.CREATED);
+        when(repository.findById(1L)).thenReturn(Optional.of(task));
+
+        BadRequest e = assertThrows(BadRequest.class, ()->service.assignTask(1L));
+
+        assertEquals("This task is already assigned", e.getMessage());
+
+        verify(mapper, never()).mapTo(any(Task.class));
+    }
+
+    @Test
     public void finishTaskTest_wrongId() {
         Task task = new Task();
         task.setId(2L);
@@ -473,6 +501,32 @@ TaskServiceTests {
         ConflictRequest e = assertThrows(ConflictRequest.class, () -> service.finishTask(1L));
 
         assertEquals("You can't finish this task", e.getMessage());
+        verify(mapper, never()).mapTo(any(Task.class));
+    }
+
+    @Test
+    public void finishTaskTest_notYoursTask(){
+        String testName = "test";
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getName()).thenReturn(testName);
+
+        SecurityContext context = mock(SecurityContext.class);
+        when(context.getAuthentication()).thenReturn(authentication);
+
+        SecurityContextHolder.setContext(context);
+        User user = new User();
+        user.setId(1L);
+        User user1 = new User();
+        user.setId(2L);
+        Task task = new Task(1L, "test", "desc", TaskStatus.ACTIVE, TaskPriority.LOW, LocalDate.now().plusDays(20), new Project(), user1);
+
+
+        when(repository.findById(1L)).thenReturn(Optional.of(task));
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+
+        BadRequest e = assertThrows(BadRequest.class, ()->service.finishTask(1L));
+        assertEquals("You can't finish someone's task", e.getMessage());
+
         verify(mapper, never()).mapTo(any(Task.class));
     }
 }

@@ -39,7 +39,7 @@ public class TaskController {
         log.info("Called delete task with id {}", id);
         service.deleteTask(id);
     }
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public TaskResponse changeTask(@PathVariable Long id, @RequestBody TaskChangeRequest request){
         log.info("Called change task with id {}", id);
         return service.changeTask(id, request);

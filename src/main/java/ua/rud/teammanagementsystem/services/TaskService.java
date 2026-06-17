@@ -109,6 +109,11 @@ public class TaskService {
        if(task.getStatus() != TaskStatus.CREATED){
            throw new ConflictRequest("You can't take this task");
        }
+
+       if(task.getUser() != null) {
+           throw new BadRequest("This task is already assigned");
+       }
+
         String username = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
                 .map(Authentication::getName)
                 .orElseThrow(() -> new NotFoundException("User is not authenticated"));
@@ -126,6 +131,15 @@ public class TaskService {
         if(task.getStatus() != TaskStatus.ACTIVE){
             throw new ConflictRequest("You can't finish this task");
         }
+        String username = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .map(Authentication::getName)
+                .orElseThrow(() -> new NotFoundException("User is not authenticated"));
+
+        User currentUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("Wrong username"));
+
+        if(!currentUser.getId().equals(task.getUser().getId())) throw new BadRequest("You can't finish someone's task");
+
         if(LocalDate.now().isAfter(task.getDeadline())){
             task.setStatus(TaskStatus.OVERDATED);
         }else {
