@@ -3,6 +3,7 @@ package ua.rud.teammanagementsystem.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -42,7 +43,9 @@ public SecurityFilterChain filterChain(HttpSecurity http){
                                     "/v3/api-docs/**",
                                     "/swagger-ui.html"
                             ).permitAll()
-                            .anyRequest().hasRole("USER")
+                            .requestMatchers(HttpMethod.GET, "/**").hasRole("USER")
+                            .requestMatchers(HttpMethod.POST, "/comments", "/tasks/assign/{id}", "/tasks/finish/{id}").hasRole("USER")
+                            .anyRequest().hasRole("ADMIN")
             )
             .sessionManagement(session ->
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
