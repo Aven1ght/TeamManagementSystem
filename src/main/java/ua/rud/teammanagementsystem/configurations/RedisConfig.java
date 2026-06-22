@@ -11,14 +11,11 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 @Configuration
 public class RedisConfig {
 
-    // 1. Для ручної роботи через RedisTemplate
     @Bean
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") // <-- Прибирає "брехливе" підкреслення в IDE
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
-        // Використовуємо нові, сучасні методи (без deprecation)
         template.setKeySerializer(RedisSerializer.string());
         template.setValueSerializer(RedisSerializer.json());
         template.setHashKeySerializer(RedisSerializer.string());
@@ -27,7 +24,6 @@ public class RedisConfig {
         return template;
     }
 
-    // 2. Якщо ви використовуєте кешування через анотації (наприклад, @Cacheable)
     @Bean
     public RedisCacheConfiguration cacheConfiguration() {
         return RedisCacheConfiguration.defaultCacheConfig()

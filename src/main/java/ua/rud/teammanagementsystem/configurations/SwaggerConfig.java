@@ -16,7 +16,6 @@ public class SwaggerConfig {
 
         return new OpenAPI()
                 .info(new Info().title("My API").version("1.0"))
-                // Крок .addSecurityItem(...) МИ ВИДАЛЯЄМО ЗВІДСИ
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName, new SecurityScheme()
                                 .name(securitySchemeName)
