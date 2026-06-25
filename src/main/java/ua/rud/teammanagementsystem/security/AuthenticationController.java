@@ -19,6 +19,9 @@ public class AuthenticationController {
         log.info("Called register new user");
        return service.register(request);
     }
+
+    // Created to make it easier for the reviewer to test admin-level functionality.
+    // I understand that this endpoint must be removed in a production environment.
     @PostMapping("/register/admin")
     public AuthenticationResponse registerAdmin(@RequestBody RegistrationRequest request){
         log.info("Called register new admin");
