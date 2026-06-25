@@ -1,11 +1,11 @@
-REST API for managing teams, users, tasks and comments.
+REST API for managing users, tasks and comments.
 Built with Spring Boot, Spring Security, PostgreSQL, Redis and Docker.
 
 ## Overview
 
-Team Management System is a REST API application designed for managing teams and tasks inside an organization.
+Team Management System is a REST API application designed for managing users and tasks inside an organization.
 
-The system allows users to create tasks, assign them to team members, leave comments and track task statuses.
+The system allows users to create tasks, assign them to members, leave comments and track task statuses.
 
 The project was created as a pet project to improve backend development skills and gain experience with Spring ecosystem technologies.
 
@@ -20,7 +20,7 @@ The project was created as a pet project to improve backend development skills a
 - Create tasks
 - Assign tasks
 - Change task status
-- View active tasks
+- View tasks
 
 ### Comments
 - Add comments to tasks
@@ -29,7 +29,6 @@ The project was created as a pet project to improve backend development skills a
 
 ### Caching
 - Redis integration
-- Cached frequently accessed data
 
 ### Documentation
 - Swagger/OpenAPI support
