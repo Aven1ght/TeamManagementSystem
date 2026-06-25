@@ -42,8 +42,8 @@ public class UserServiceTest {
     User user1 = new User(1L, "test1", "testEmail", Role.USER, "pass");
     User user2 = new User(2L, "test2", "testEmail", Role.USER, "pass");
 
-    UserResponse response1 = new UserResponse(user1.getId(), user1.getUsername(), user1.getPassword());
-    UserResponse response2 = new UserResponse(user2.getId(), user2.getUsername(), user2.getPassword());
+    UserResponse response1 = new UserResponse(user1.getId(), user1.getUsername(), user1.getEmail());
+    UserResponse response2 = new UserResponse(user2.getId(), user2.getUsername(), user2.getEmail());
 
     Pageable pageable = PageRequest.of(0, 10);
     List<User> users = List.of(user1, user2);
