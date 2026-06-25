@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ua.rud.teammanagementsystem.entity.User;
 import ua.rud.teammanagementsystem.enums.Role;
+import ua.rud.teammanagementsystem.exceptions.NotFoundException;
 import ua.rud.teammanagementsystem.repositories.UserRepository;
 
 @Service
@@ -44,7 +45,7 @@ public class AuthenticationService {
 
         var user = userRepository
                 .findByUsername(request.getName())
-                .orElseThrow();
+                .orElseThrow(()->new NotFoundException("User not found"));
 
         String jwt = jwtService.generateToken(user);
         log.info("User {} was successfully authenticated", request.getName());

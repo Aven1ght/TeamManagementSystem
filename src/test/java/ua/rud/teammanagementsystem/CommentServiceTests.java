@@ -66,8 +66,8 @@ public class CommentServiceTests {
     User user2 = new User(); user2.setId(2L);
     Comment comment2 = new Comment(2L, "text", task2, user2, LocalDate.now());
 
-    CommentResponse response1 = new CommentResponse(1L, "text", 1L, 1L,LocalDate.now());
-    CommentResponse response2 = new CommentResponse(2L, "text", 2L, 2L,LocalDate.now());
+    CommentResponse response1 = new CommentResponse(1L, "text", null, null,null);
+    CommentResponse response2 = new CommentResponse(2L, "text", null, null,null);
 
     Pageable pageable = PageRequest.of(0, 10);
     List<Comment> comments = List.of(comment1, comment2);
@@ -123,7 +123,7 @@ public class CommentServiceTests {
     user.setId(1L);
     Comment comment = new Comment(null, request.text(), task, null, LocalDate.now());
     Comment saved = new Comment(1L, comment.getText(), task, null, comment.getCreated_at());
-    CommentResponse response = new CommentResponse(saved.getId(), saved.getText(), 1L, user.getId(), saved.getCreated_at());
+    CommentResponse response = new CommentResponse(saved.getId(), saved.getText(), task.getProject().getId(), user.getId(), saved.getCreated_at());
 
     Authentication authentication = mock(Authentication.class);
     when(authentication.getName()).thenReturn(testName);

@@ -56,5 +56,7 @@ private final CacheService cacheService;
     public void delete(Long id) {
         Project projectToDelete = repository.findById(id).orElseThrow(()-> new NotFoundException("Wrong project id"));
         repository.delete(projectToDelete);
+        cacheService.delete(id.toString());
+        log.info("Project with id {} deleted successfully", id);
     }
 }

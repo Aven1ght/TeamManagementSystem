@@ -129,6 +129,7 @@ public class ProjectServiceTests {
         service.delete(1L);
 
         verify(repository).delete(p);
+        verify(cacheService).delete(anyString());
     }
     @Test
     public void getAllProjects_emptyPage(){
@@ -173,5 +174,6 @@ public class ProjectServiceTests {
         assertEquals("Wrong project id", e.getMessage());
 
         verify(repository, never()).delete(any());
+        verify(cacheService, never()).delete(anyString());
     }
 }
