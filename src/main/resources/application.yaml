@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/TeamManagementSystem
     username: postgres
-    password: postgres # <-- ВИПРАВЛЕНО: пароль тепер збігається з compose.yaml
+    password: postgres
     driver-class-name: org.postgresql.Driver
 
   jpa:
