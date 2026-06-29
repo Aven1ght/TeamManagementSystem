@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import ua.rud.teammanagementsystem.entity.Project;
 import ua.rud.teammanagementsystem.exceptions.BadRequest;
 import ua.rud.teammanagementsystem.exceptions.NotFoundException;
 import ua.rud.teammanagementsystem.mappers.CommentMapper;
@@ -116,9 +117,12 @@ public class CommentServiceTests {
 @Test
     public void createCommentTest() {
     String testName = "test";
+    Project p = new Project();
+    p.setId(1L);
     CommentRequest request = new CommentRequest("text", 1L);
     Task task = new Task();
     task.setId(1L);
+    task.setProject(p);
     User user = new User();
     user.setId(1L);
     Comment comment = new Comment(null, request.text(), task, null, LocalDate.now());
