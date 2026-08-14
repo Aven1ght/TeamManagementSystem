@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ua.rud.teammanagementsystem.entity.User;
 import ua.rud.teammanagementsystem.enums.Role;
+import ua.rud.teammanagementsystem.exceptions.BadRequest;
 import ua.rud.teammanagementsystem.exceptions.NotFoundException;
 import ua.rud.teammanagementsystem.repositories.UserRepository;
 
@@ -24,6 +25,11 @@ public class AuthenticationService {
     private final Logger log = LoggerFactory.getLogger(AuthenticationService.class);
 
     public AuthenticationResponse register(RegistrationRequest request){
+        if(userRepository.findByUsername(request.getName()).isPresent()
+                || userRepository.findByEmail(request.getEmail()).isPresent()
+        ){
+            throw new BadRequest("Such user is already exists");
+        }
         User user = User.builder()
                 .username(request.getName())
                 .password(encoder.encode(request.getPassword()))
@@ -55,6 +61,11 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse registerAdmin(RegistrationRequest request) {
+        if(userRepository.findByUsername(request.getName()).isPresent()
+                || userRepository.findByEmail(request.getEmail()).isPresent()
+        ){
+            throw new BadRequest("Such user is already exists");
+        }
         User user = User.builder()
                 .username(request.getName())
                 .password(encoder.encode(request.getPassword()))
