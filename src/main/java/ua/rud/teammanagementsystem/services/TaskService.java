@@ -44,14 +44,14 @@ public class TaskService {
     }
 
     public TaskResponse getById(Long id){
-       TaskResponse cachedResponse = cacheService.get(id.toString(), TaskResponse.class);
+       TaskResponse cachedResponse = cacheService.get("task:" + id, TaskResponse.class);
 
        if(cachedResponse != null){
            log.info("Task with id {} got from cache successfully", id);
            return cachedResponse;
        }
         TaskResponse response = mapper.mapTo(repository.findById(id).orElseThrow(()-> new NotFoundException("Wrong id")));
-        cacheService.set(id.toString(), response, 10);
+        cacheService.set("task:" + id, response, 10);
         log.info("Task with id {} got successfully", id);
         return response;
     }
@@ -84,7 +84,7 @@ public class TaskService {
 
     public void deleteTask(Long id) {
         Task task = repository.findById(id).orElseThrow(()-> new NotFoundException("Wrong id"));
-        cacheService.delete(id.toString());
+        cacheService.delete("task:" + id);
         log.info("Task with id {} deleted successfully", id);
         repository.delete(task);
     }
@@ -98,7 +98,7 @@ public class TaskService {
         task.setUser(userRepository.findById(request.user_id()).orElseThrow(()-> new NotFoundException("Wrong user id")));
 
 
-        cacheService.delete(id.toString());
+        cacheService.delete("task:" +id);
         log.info("Task with id {} changed successfully", id);
         return mapper.mapTo(task);
     }
@@ -123,6 +123,8 @@ public class TaskService {
 
        task.setUser(currentUser);
        task.setStatus(TaskStatus.ACTIVE);
+       cacheService.delete("task:" + task.getId());
+       repository.save(task);
        return mapper.mapTo(task);
     }
 

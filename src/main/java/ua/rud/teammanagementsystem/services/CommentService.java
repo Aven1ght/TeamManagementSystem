@@ -39,14 +39,14 @@ private final CacheService cacheService;
     }
 
     public CommentResponse getById(Long id) {
-        CommentResponse cached = cacheService.get(id.toString(), CommentResponse.class);
+        CommentResponse cached = cacheService.get("comment:" + id.toString(), CommentResponse.class);
         if(cached != null){
             log.info("Comment with id {} got from cache successfully", id);
             return cached;
         }
 
         CommentResponse response = mapper.mapTo(repository.findById(id).orElseThrow(()->new NotFoundException("Wrong id")));
-        cacheService.set(id.toString(), response, 10);
+        cacheService.set("comment:" + id, response, 10);
         log.info("Comment with id {} got successfully", id);
         return response;
     }
@@ -77,7 +77,7 @@ private final CacheService cacheService;
     public void deleteComment(Long id) {
         Comment commentToDelete = repository.findById(id).orElseThrow(()-> new  NotFoundException("Wrong comment id"));
         repository.delete(commentToDelete);
-        cacheService.delete(id.toString());
+        cacheService.delete("comment:" + id);
         log.info("Comment deleted successfully");
     }
 }

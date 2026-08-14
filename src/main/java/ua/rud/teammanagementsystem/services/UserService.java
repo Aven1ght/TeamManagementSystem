@@ -27,13 +27,13 @@ private final CacheService cacheService;
     }
 
     public UserResponse getUserById(Long id) {
-        UserResponse cached = cacheService.get(id.toString(), UserResponse.class);
+        UserResponse cached = cacheService.get("user:" + id, UserResponse.class);
         if(cached != null){
             log.info("User with id {} got from cache successfully", id);
             return cached;
         }
         UserResponse response = mapper.mapTo(repository.findById(id).orElseThrow(()-> new NotFoundException("Wrong id")));
-        cacheService.set(id.toString(), response, 10);
+        cacheService.set("user:" + id, response, 10);
         log.info("User with id {} got successfully", id);
         return response;
     }
@@ -41,7 +41,7 @@ private final CacheService cacheService;
     @Transactional
     public void deleteUser(Long id) {
        User user =  repository.findById(id).orElseThrow(()-> new NotFoundException("Wrong id"));
-       cacheService.delete(id.toString());
+       cacheService.delete("user:" + id);
        log.info("User with id {} deleted successfully", id);
        repository.delete(user);
     }

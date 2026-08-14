@@ -31,14 +31,14 @@ private final CacheService cacheService;
     }
 
     public ProjectResponse getById(Long id) {
-        ProjectResponse cached = cacheService.get(id.toString(), ProjectResponse.class);
+        ProjectResponse cached = cacheService.get("project:" + id, ProjectResponse.class);
         if(cached != null){
             log.info("Project with id {} got from cache successfully", id);
             return cached;
         }
 
         ProjectResponse response = mapper.mapTo(repository.findById(id).orElseThrow(()-> new NotFoundException("Wrong id")));
-        cacheService.set(id.toString(), response, 10);
+        cacheService.set("project:" + id, response, 10);
         log.info("Project with id {} got successfully", id);
         return response;
     }
@@ -56,7 +56,7 @@ private final CacheService cacheService;
     public void delete(Long id) {
         Project projectToDelete = repository.findById(id).orElseThrow(()-> new NotFoundException("Wrong project id"));
         repository.delete(projectToDelete);
-        cacheService.delete(id.toString());
+        cacheService.delete("project:" + id);
         log.info("Project with id {} deleted successfully", id);
     }
 }
