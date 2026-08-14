@@ -148,6 +148,7 @@ public class TaskService {
             task.setStatus(TaskStatus.COMPLETED);
         }
 
+        cacheService.delete("task:" + id);
         return mapper.mapTo(task);
 
     }
