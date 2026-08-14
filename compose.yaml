@@ -5,7 +5,7 @@ services:
     image: postgres:16
     container_name: teammanagementsystem-postgres
     environment:
-      POSTGRES_DB: TeamManagementSystem
+      POSTGRES_DB: team_management_system
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:

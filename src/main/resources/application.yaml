@@ -3,7 +3,7 @@ spring:
     name: TeamManagementSystem
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/TeamManagementSystem
+    url: jdbc:postgresql://localhost:5432/team_management_system
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
