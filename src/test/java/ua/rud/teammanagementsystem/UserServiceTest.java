@@ -67,7 +67,7 @@ public class UserServiceTest {
     public void getUserByIdTest_cache(){
     UserResponse response = new UserResponse(1L, "test", "testEmail");
 
-    when(cacheService.get("1", UserResponse.class)).thenReturn(response);
+    when(cacheService.get("user:1", UserResponse.class)).thenReturn(response);
 
     UserResponse res = service.getUserById(1L);
 
@@ -87,7 +87,7 @@ public class UserServiceTest {
     UserResponse res = service.getUserById(1L);
     assertEquals(response, res);
 
-    verify(cacheService).set("1", response, 10);
+    verify(cacheService).set("user:1", response, 10);
     verify(mapper).mapTo(any(User.class));
 }
 
@@ -99,7 +99,7 @@ public class UserServiceTest {
 
     service.deleteUser(1L);
 
-    verify(cacheService).delete("1");
+    verify(cacheService).delete("user:1");
     verify(repository).delete(user);
 }
 

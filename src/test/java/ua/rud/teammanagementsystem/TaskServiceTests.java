@@ -108,7 +108,7 @@ TaskServiceTests {
         u.setId(1L);
         TaskResponse response = new TaskResponse(taskId, "test", "test", TaskStatus.ACTIVE, TaskPriority.LOW, LocalDate.now().plusDays(20), p.getId(), u.getId());
 
-        when(cacheService.get(taskId.toString(), TaskResponse.class)).thenReturn(response);
+        when(cacheService.get("task:" + taskId, TaskResponse.class)).thenReturn(response);
 
         TaskResponse actual = service.getById(taskId);
 
@@ -128,7 +128,7 @@ TaskServiceTests {
         Task task = new Task(1L, "test", "test", TaskStatus.ACTIVE, TaskPriority.LOW, LocalDate.now().plusDays(20), p, u);
         TaskResponse response = new TaskResponse(1L, "test", "test", TaskStatus.ACTIVE, TaskPriority.LOW, LocalDate.now().plusDays(20), p.getId(), u.getId());
 
-        when(cacheService.get("1", TaskResponse.class)).thenReturn(null);
+        when(cacheService.get("task:1", TaskResponse.class)).thenReturn(null);
         when(repository.findById(1L)).thenReturn(Optional.of(task));
         when(mapper.mapTo(any(Task.class))).thenReturn(response);
 
@@ -137,7 +137,7 @@ TaskServiceTests {
         assertEquals(response, actual);
 
         verify(repository).findById(1L);
-        verify(cacheService).set("1", response, 10);
+        verify(cacheService).set("task:1", response, 10);
     }
 
     @Test
@@ -192,7 +192,7 @@ TaskServiceTests {
         TaskResponse response = service.changeTask(1L, request);
         assertEquals(expected, response);
 
-        verify(cacheService).delete("1");
+        verify(cacheService).delete("task:1");
         verify(mapper).mapTo(oldTask);
     }
 

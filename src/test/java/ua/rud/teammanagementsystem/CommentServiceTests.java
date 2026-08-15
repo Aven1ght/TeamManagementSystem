@@ -91,7 +91,7 @@ public class CommentServiceTests {
     public void getCommentByIdTest_cache(){
     CommentResponse response = new CommentResponse(1L, "text", 1L, 1L,  LocalDate.now());
 
-    when(cacheService.get("1", CommentResponse.class)).thenReturn(response);
+    when(cacheService.get("comment:1", CommentResponse.class)).thenReturn(response);
 
     CommentResponse res = service.getById(1L);
     assertEquals(response, res);
@@ -110,7 +110,7 @@ public class CommentServiceTests {
     CommentResponse res = service.getById(1L);
 
     assertEquals(response, res);
-    verify(cacheService).set("1", response, 10);
+    verify(cacheService).set("comment:1", response, 10);
     verify(repository).findById(1L);
 }
 
@@ -162,7 +162,7 @@ public class CommentServiceTests {
 
 
         verify(repository).delete(argThat(c-> c.getId().equals(1L)));
-        verify(cacheService).delete("1");
+        verify(cacheService).delete("comment:1");
     }
 
     @Test

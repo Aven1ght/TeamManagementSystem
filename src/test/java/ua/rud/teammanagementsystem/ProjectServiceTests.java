@@ -71,7 +71,7 @@ public class ProjectServiceTests {
     @Test
     public void getByIdTest_cached(){
         ProjectResponse response = new ProjectResponse(1L, "test", "test");
-        when(cacheService.get("1", ProjectResponse.class)).thenReturn(response);
+        when(cacheService.get("project:1", ProjectResponse.class)).thenReturn(response);
 
         ProjectResponse actual = service.getById(1L);
 
@@ -89,7 +89,7 @@ public class ProjectServiceTests {
         project.setName("test");
         ProjectResponse response = new ProjectResponse(1L, "test", "test");
 
-        when(cacheService.get("1", ProjectResponse.class)).thenReturn(null);
+        when(cacheService.get("project:1", ProjectResponse.class)).thenReturn(null);
         when(repository.findById(1L)).thenReturn(Optional.of(project));
         when(mapper.mapTo(any(Project.class))).thenReturn(response);
 
@@ -97,7 +97,7 @@ public class ProjectServiceTests {
 
         assertEquals(response, actual);
 
-        verify(cacheService).set("1", response, 10);
+        verify(cacheService).set("project:1", response, 10);
         verify(repository).findById(1L);
     }
 
